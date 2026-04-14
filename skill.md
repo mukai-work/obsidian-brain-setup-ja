@@ -176,10 +176,59 @@ tags: [x-capture]
 3. 新規ノートを作成 → X保存テンプレートを適用
 4. ポスト内容と感想を記録
 
-**方法2: IFTTT自動連携**
-1. [ifttt.com](https://ifttt.com) でアカウント作成
-2. 「Xでいいねしたツイート → ObsidianのInboxに追加」のアプレットを設定
-3. ※ ObsidianはIFTTTのWebhook + DropboxまたはGit連携が必要
+**方法2: IFTTT自動連携（いいねしたポストを自動保存）**
+
+**必要なもの:**
+- IFTTTアカウント（無料プランでOK）
+- DropboxまたはGoogleドライブアカウント
+- ObsidianのVaultをDropbox/GoogleDrive上に置いていること
+
+**手順:**
+
+1. **Obsidian VaultをDropboxに移動する**
+   - Dropbox上に `Obsidian/MyBrain/` フォルダを作成
+   - 既存のVaultをそのフォルダに移動
+   - ObsidianでVaultの場所を新しいパスに変更（設定→Vaultを開く）
+
+2. **IFTTTでアプレットを作成する**
+   - [ifttt.com](https://ifttt.com) にアクセスしてアカウント作成
+   - 「Create」→「If This」で **X（Twitter）** を選択
+   - トリガー: **「New liked tweet by you」**（自分がいいねしたポスト）
+   - 「Then That」で **Dropbox** を選択
+   - アクション: **「Create a text file」**
+   - 以下のように設定:
+     ```
+     File name: {{CreatedAt}}_x-capture
+     Content:
+     ---
+     captured: {{CreatedAt}}
+     source: X（旧Twitter）
+     author: @{{UserName}}
+     tags: [x-capture]
+     ---
+
+     ## ポスト内容
+
+     {{Text}}
+
+     ## 元のURL
+
+     {{LinkToTweet}}
+
+     ## 自分のメモ・感想
+
+     （ここに感想を書く）
+     ```
+     Folder path: `Obsidian/MyBrain/07_X-Captures/`
+
+3. **保存して有効化**
+   - 「Continue」→「Finish」でアプレット完成
+   - Xでいいねするたびに自動でObsidianのフォルダにMarkdownファイルが作成される
+
+**注意点:**
+- IFTTTの無料プランはアプレット数に制限あり（5個まで）
+- ファイルが作成されるまで数分かかる場合がある
+- Dropbox上のファイルはObsidianアプリが次回起動時に自動認識する
 
 **方法3: Claude Codeで自動化（上級者向け）**
 ```
