@@ -1,82 +1,85 @@
 ---
 name: obsidian-brain-setup-ja
-description: Obsidianを「第二の脳」としてセットアップする完全ガイドとフォルダ構造・テンプレート・X連携設定を自動生成するスキル
-version: 1.0.0
-tags: [japanese, obsidian, pkm, productivity, second-brain, x-twitter]
+description: Obsidianを「第二の脳」としてセットアップするSkill。Vaultのパスを渡すだけでフォルダ構造・テンプレートファイルを自動生成。X連携設定ガイドも出力。
+version: 2.0.0
+tags: [japanese, obsidian, pkm, productivity, second-brain, x-twitter, automation]
 ---
 
 ## 役割
 
-あなたはPKM（Personal Knowledge Management）の専門家であり、ObsidianとXを組み合わせた「第二の脳」構築のエキスパートです。
-ユーザーの用途・職種・目的に合わせて、すぐに使い始められるObsidianのセットアップ一式を自動生成します。
+あなたはPKM（Personal Knowledge Management）の専門家です。
+ユーザーのObsidian Vaultに対して、**フォルダ構造の作成とテンプレートファイルの生成を実際に実行します。**
 
-**このSkillが解決する問題:**
-- 「Obsidianを入れたけど何から始めればいいかわからない」
-- 「フォルダ構造をどう作ればいいかわからない」
-- 「XのポストをObsidianに自動で取り込みたい」
-- 「毎日のメモ・アイデアを体系的に管理したい」
+このSkillはガイドを出力するだけでなく、Claude Codeのファイル操作機能を使って**セットアップを自動で完了させます。**
 
 ## 処理手順
 
-### STEP 1: ヒアリング（3問だけ）
+### STEP 1: ヒアリング（4問）
 
-以下の3問をまとめて質問し、回答を待つ。
+以下をまとめて質問し、回答を待つ。
 
 ```
-Obsidianセットアップを始めます。3問だけ教えてください。
+Obsidianのセットアップを始めます。4問教えてください。
 
-Q1. 主な用途は？（複数選択可）
-   A) 日々のメモ・日記
-   B) 仕事のプロジェクト管理
-   C) 学習・読書記録
-   D) ブログ・SNS発信のネタ帳
-   E) アイデア・思考整理
+Q1. ObsidianのVaultフォルダのパスを教えてください。
+    例: C:/Users/username/Documents/MyBrain
+        /Users/username/Documents/MyBrain（Mac）
 
-Q2. 職種・立場は？
-   A) 会社員
-   B) 個人事業主・フリーランス
-   C) 副業中
-   D) 学生
+Q2. 主な用途は？（複数選択可）
+    A) 日々のメモ・日記
+    B) 仕事・案件管理
+    C) 学習・読書記録
+    D) ブログ・SNS発信のネタ帳
+    E) アイデア・思考整理
 
-Q3. X（旧Twitter）との連携は使いたい？
-   A) はい（XのポストをObsidianに保存したい）
-   B) はい（ObsidianのメモをXポスト用に変換したい）
-   C) 両方
-   D) 不要
+Q3. 職種・立場は？
+    A) 会社員
+    B) 個人事業主・フリーランス
+    C) 副業中
+    D) 学生
+
+Q4. X（旧Twitter）との連携は使いたい？
+    A) はい（XのポストをObsidianに保存したい）
+    B) はい（ObsidianのメモをXポスト用に変換したい）
+    C) 両方
+    D) 不要
 ```
-
-### STEP 2: 回答を受けてセットアップ一式を生成
-
-回答に合わせて以下をすべて出力する。
 
 ---
 
-## 出力フォーマット
+### STEP 2: フォルダを自動作成する
 
-### 【1】フォルダ構造
+回答のVaultパスをベースに、以下のフォルダをBashコマンドで実際に作成する。
 
-用途に合わせたObsidianのVault構成をツリー形式で出力する。
-
-**基本構造（全ユーザー共通）:**
-```
-📁 MyBrain/
-├── 📁 00_Inbox/          ← まず何でもここに放り込む
-├── 📁 01_Daily/          ← デイリーノート（日付別）
-├── 📁 02_Projects/       ← プロジェクト別メモ
-├── 📁 03_Areas/          ← 継続的な関心領域
-├── 📁 04_Resources/      ← 参考資料・リサーチ
-├── 📁 05_Archive/        ← 完了・不要になったもの
-├── 📁 06_Templates/      ← テンプレートファイル
-└── 📁 07_X-Captures/     ← XのポストをObsidianに保存（X連携あり）
+**全ユーザー共通（必ず作成）:**
+```bash
+mkdir -p "{VAULT_PATH}/00_Inbox"
+mkdir -p "{VAULT_PATH}/01_Daily"
+mkdir -p "{VAULT_PATH}/02_Projects"
+mkdir -p "{VAULT_PATH}/03_Areas"
+mkdir -p "{VAULT_PATH}/04_Resources"
+mkdir -p "{VAULT_PATH}/05_Archive"
+mkdir -p "{VAULT_PATH}/06_Templates"
 ```
 
-用途に応じて追加フォルダを提案する。
+**X連携ありの場合（Q4がA/B/Cの場合）:**
+```bash
+mkdir -p "{VAULT_PATH}/07_X-Captures"
+```
+
+**用途に応じて追加（Q2の回答による）:**
+- B（仕事・案件管理）→ `02_Projects/active` `02_Projects/archive`
+- C（学習・読書）→ `04_Resources/books` `04_Resources/articles`
+- D（ブログ・SNS）→ `03_Areas/blog` `03_Areas/sns`
 
 ---
 
-### 【2】テンプレートファイル（コピペで即使える）
+### STEP 3: テンプレートファイルを自動生成する
+
+以下のテンプレートファイルを `06_Templates/` フォルダに作成する。
 
 #### デイリーノートテンプレート
+ファイル名: `06_Templates/daily-note.md`
 ```markdown
 ---
 date: {{date:YYYY-MM-DD}}
@@ -99,6 +102,7 @@ tags: [daily]
 ```
 
 #### アイデアキャプチャテンプレート
+ファイル名: `06_Templates/idea-capture.md`
 ```markdown
 ---
 created: {{date:YYYY-MM-DD HH:mm}}
@@ -107,7 +111,6 @@ status: raw
 ---
 
 ## アイデア
-（ここにアイデアを書く）
 
 ## なぜ面白いと思ったか
 
@@ -115,7 +118,29 @@ status: raw
 - [ ] 
 ```
 
-#### X投稿ネタテンプレート（X連携使用時）
+#### プロジェクトテンプレート（用途Bの場合）
+ファイル名: `06_Templates/project.md`
+```markdown
+---
+created: {{date:YYYY-MM-DD}}
+status: active
+tags: [project]
+---
+
+## 概要
+
+## ゴール
+
+## タスク
+- [ ] 
+
+## メモ
+
+## 完了日
+```
+
+#### X投稿ネタテンプレート（X連携ありの場合）
+ファイル名: `06_Templates/x-post-draft.md`
 ```markdown
 ---
 created: {{date:YYYY-MM-DD HH:mm}}
@@ -130,11 +155,13 @@ status: draft
 ## 関連メモ
 ```
 
-#### X保存テンプレート（Xからの取り込み用）
+#### X保存テンプレート（X連携ありの場合）
+ファイル名: `06_Templates/x-capture.md`
 ```markdown
 ---
 captured: {{date:YYYY-MM-DD HH:mm}}
 source: X（旧Twitter）
+author: 
 tags: [x-capture]
 ---
 
@@ -147,56 +174,55 @@ tags: [x-capture]
 
 ---
 
-### 【3】おすすめプラグイン（優先度順）
+### STEP 4: セットアップ完了メッセージを出力する
 
-| 優先度 | プラグイン名 | 用途 | インストール方法 |
-|---|---|---|---|
-| 必須 | **Templater** | テンプレートの自動挿入 | コミュニティプラグイン |
-| 必須 | **Daily Notes** | デイリーノート自動作成 | コアプラグイン（設定で有効化） |
-| 必須 | **Dataview** | メモをデータベース的に検索・集計 | コミュニティプラグイン |
-| 推奨 | **Calendar** | カレンダーUIでデイリーノートを開く | コミュニティプラグイン |
-| 推奨 | **Tag Wrangler** | タグの一括管理 | コミュニティプラグイン |
-| 推奨 | **Kanban** | タスク管理をかんばん形式で | コミュニティプラグイン |
-| X連携 | **QuickAdd** | ショートカットキーで素早くメモ追加 | コミュニティプラグイン |
+作成したフォルダ・ファイルの一覧を表示し、以下を案内する。
 
-**インストール手順:**
-1. Obsidianを開く
-2. 設定（⚙️）→ コミュニティプラグイン → 閲覧
-3. 各プラグイン名で検索 → インストール → 有効化
+**【完了】自動セットアップが終わりました**
+
+作成したもの:
+- フォルダ: （作成したフォルダ一覧）
+- テンプレート: （作成したファイル一覧）
+
+**次にやること（手動・5分）:**
+
+1. **Templaterプラグインをインストールする**
+   - Obsidian設定 → コミュニティプラグイン → 閲覧 → 「Templater」で検索 → インストール → 有効化
+   - Templater設定 → Template folder location → `06_Templates` を指定
+
+2. **Daily Notesを設定する**
+   - Obsidian設定 → コアプラグイン → Daily notes → 有効化
+   - New file location: `01_Daily`
+   - Template file: `06_Templates/daily-note`
+
+3. **Dataviewプラグインをインストールする**（オプション）
+   - コミュニティプラグイン → 「Dataview」で検索 → インストール → 有効化
 
 ---
 
-### 【4】X連携の設定方法（希望した場合）
+### STEP 5: X連携の設定方法を出力する（X連携希望の場合のみ）
 
-#### パターンA: XのポストをObsidianに保存する
+#### パターンA: 手動キャプチャ（今すぐ使える）
 
-**方法1: 手動キャプチャ（おすすめ・無料）**
-1. 保存したいポストのURLをコピー
-2. Obsidianで `07_X-Captures/` フォルダを開く
-3. 新規ノートを作成 → X保存テンプレートを適用
-4. ポスト内容と感想を記録
+気になったXのポストを見たら:
+1. ポストのURLをコピー
+2. Obsidianで `07_X-Captures/` に新規ノート作成（`x-capture` テンプレートを適用）
+3. ポスト内容と一言感想を書く
 
-**方法2: IFTTT自動連携（いいねしたポストを自動保存）**
+#### パターンB: IFTTT自動連携（いいねしたポストを自動保存）
 
-**必要なもの:**
-- IFTTTアカウント（無料プランでOK）
-- DropboxまたはGoogleドライブアカウント
-- ObsidianのVaultをDropbox/GoogleDrive上に置いていること
+**前提:** ObsidianのVaultをDropboxフォルダ内に置く必要があります。
 
-**手順:**
-
-1. **Obsidian VaultをDropboxに移動する**
-   - Dropbox上に `Obsidian/MyBrain/` フォルダを作成
-   - 既存のVaultをそのフォルダに移動
-   - ObsidianでVaultの場所を新しいパスに変更（設定→Vaultを開く）
+1. **Dropboxに移動する**
+   - Dropboxフォルダ内に `Obsidian/` フォルダを作成
+   - 現在のVaultをそこに移動
+   - ObsidianでVaultの場所を新しいパスに変更
 
 2. **IFTTTでアプレットを作成する**
-   - [ifttt.com](https://ifttt.com) にアクセスしてアカウント作成
-   - 「Create」→「If This」で **X（Twitter）** を選択
-   - トリガー: **「New liked tweet by you」**（自分がいいねしたポスト）
-   - 「Then That」で **Dropbox** を選択
-   - アクション: **「Create a text file」**
-   - 以下のように設定:
+   - [ifttt.com](https://ifttt.com) でアカウント作成（無料）
+   - 「Create」→「If This」→ **X（Twitter）** → **「New liked tweet by you」**
+   - 「Then That」→ **Dropbox** → **「Create a text file」**
+   - 設定値:
      ```
      File name: {{CreatedAt}}_x-capture
      Content:
@@ -208,45 +234,24 @@ tags: [x-capture]
      ---
 
      ## ポスト内容
-
      {{Text}}
 
      ## 元のURL
-
      {{LinkToTweet}}
 
      ## 自分のメモ・感想
-
-     （ここに感想を書く）
      ```
-     Folder path: `Obsidian/MyBrain/07_X-Captures/`
+     Folder path: `Obsidian/（VaultフォルダName）/07_X-Captures/`
 
-3. **保存して有効化**
-   - 「Continue」→「Finish」でアプレット完成
-   - Xでいいねするたびに自動でObsidianのフォルダにMarkdownファイルが作成される
+3. 「Continue」→「Finish」で完成
 
-**注意点:**
-- IFTTTの無料プランはアプレット数に制限あり（5個まで）
-- ファイルが作成されるまで数分かかる場合がある
-- Dropbox上のファイルはObsidianアプリが次回起動時に自動認識する
-
-**方法3: Claude Codeで自動化（上級者向け）**
-```
-「私のXのブックマーク一覧を貼り付けます。
- 各ポストをObsidian用のMarkdownに変換して、
- 07_X-Captures/フォルダに保存できる形式で出力してください」
-```
-
-#### パターンB: ObsidianのメモをXポストに変換する
+#### パターンC: ObsidianのメモをXポストに変換する
 
 Claude Codeへの指示テンプレート:
 ```
 以下のObsidianメモをXのポスト用に変換してください。
-
-【ルール】
 - 280文字以内（日本語）
-- ハッシュタグは2個以内
-- 「えー」「あー」などの不要な言葉は削除
+- ハッシュタグ2個以内
 - 体験談・気づきのトーンで
 
 【メモ】
@@ -255,11 +260,11 @@ Claude Codeへの指示テンプレート:
 
 ---
 
-### 【5】「第二の脳」として使い続けるための3つのルール
+## 続けるための3つのルール
 
-1. **まずInboxに入れる** → 完璧に分類しようとしない。とにかく書く
-2. **週1回だけ整理する** → 毎日やると続かない。週末15分だけ
-3. **検索に頼る** → フォルダ構造より検索（Cmd/Ctrl+O）のほうが速い
+1. **まずInboxに放り込む** — 完璧に分類しようとしない。とにかく書く
+2. **週1回だけ整理する** — 毎日やると続かない。週末15分だけ
+3. **検索に頼る** — フォルダよりも `Cmd/Ctrl+O` の検索が速い
 
 ---
 
@@ -269,12 +274,11 @@ Claude Codeへの指示テンプレート:
 /obsidian-brain-setup-ja
 ```
 
-Skillを呼び出すだけで自動的に3問の質問から始まります。
-回答後、あなたの用途に合わせたセットアップ一式が出力されます。
+呼び出すと4問の質問が始まります。Vaultのパスを答えれば、フォルダ作成からテンプレート生成まで自動で完了します。
 
 ## 重要なルール
 
-- 技術的に難しい設定は後回しにして、まず「今日から使える最小構成」を出力する
-- プラグインは多く入れるほど良いわけではない。最初は必須3つだけを勧める
-- ユーザーが圧倒されないよう、出力はセクションごとに分けて読みやすくする
-- X連携は希望した人にのみ出力する（不要な人に複雑な情報を出さない）
+- Vaultパスが存在しない場合は作成前にユーザーに確認する
+- 既存のファイル・フォルダを上書き・削除しない
+- STEP 2・3の実行前に「以下を作成します。よろしいですか？」と確認を取る
+- X連携のIFTTT設定はDropboxへの移行が必要なため、既存VaultがDropboxにない場合は移行が必要な旨を伝える
